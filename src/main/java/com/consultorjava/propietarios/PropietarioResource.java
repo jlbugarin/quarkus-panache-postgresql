@@ -20,7 +20,7 @@ public class PropietarioResource {
 
     @GET
     public List<PropietariosEntity> list() {
-        
+
         List<PropietariosEntity> allPropietarios = PropietariosEntity.listAll();
         return allPropietarios;
     }
@@ -30,7 +30,6 @@ public class PropietarioResource {
     public Response create(final PropietariosEntity prop) throws Exception {
 
         prop.id = null;
-        
 
         prop.persist();
 
@@ -40,10 +39,16 @@ public class PropietarioResource {
 
     @DELETE
     @Transactional
-    public List<PropietariosEntity> delete(PropietariosDTO prop) {
+    public Response delete(PropietariosDTO prop) {
 
-        PropietariosEntity.deleteById(prop.getId());
-        return PropietariosEntity.listAll();
+        boolean entidad = PropietariosEntity.deleteById(prop.getId());
+        if(entidad){
+            return Response.status(Status.CREATED).build();
+        }else{
+            return Response.status(Status.NOT_FOUND).build();
+        }
+
+        
     }
 
     @PUT
@@ -53,14 +58,22 @@ public class PropietarioResource {
 
         PropietariosEntity entidad = PropietariosEntity.findById(prop.getId());
 
-        entidad.setNombres(prop.getNombres());
-        entidad.setApellidos(prop.getApellidos());
-        entidad.setEmail(prop.getEmail());
-        entidad.setTipoDocumento(prop.getTipoDocumento());
-        entidad.setNumDocumento(prop.getNumDocumento());
-        entidad.setNumTelefono(prop.getNumTelefono());
+        if (entidad != null) {
 
-        return Response.status(Status.CREATED).entity(prop).build();
+            entidad.setNombres(prop.getNombres());
+            entidad.setApellidos(prop.getApellidos());
+            entidad.setEmail(prop.getEmail());
+            entidad.setTipoDocumento(prop.getTipoDocumento());
+            entidad.setNumDocumento(prop.getNumDocumento());
+            entidad.setNumTelefono(prop.getNumTelefono());
+
+            return Response.status(Status.CREATED).entity(prop).build();
+
+        } else {
+
+            return Response.status(Status.NOT_FOUND).build();
+
+        }
 
     }
 
